@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 
 class ViewController: UIViewController {
-    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
@@ -18,12 +17,10 @@ class ViewController: UIViewController {
         tableView.register(PictureCell.self, forCellReuseIdentifier: "PictureCell")
         return tableView
        }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
-    
     private func setupViews() {
         tabBarItem.image = UIImage(systemName: "list.bullet")
         title = "List"
@@ -34,14 +31,12 @@ class ViewController: UIViewController {
         }
     }
 }
-//MARK: - TableViewDataSource
+// MARK: - TableViewDataSource
 
 extension ViewController: UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         6
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PictureCell")
         guard let safeCell = cell else {
@@ -50,4 +45,3 @@ extension ViewController: UITableViewDataSource {
         return safeCell
     }
 }
-
