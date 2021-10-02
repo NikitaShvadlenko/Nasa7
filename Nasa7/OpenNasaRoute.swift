@@ -16,6 +16,7 @@ enum OpenNasaRoute {
 extension OpenNasaRoute: TargetType {
     var baseURL: URL {
         // Как URL Вобще может быть Optional, если я туда Литерал пишу?
+        // Потому что при инициализации var всегда будет nil.
         URL(string: "https://api.nasa.gov/planetary/")!
     }
     var path: String {

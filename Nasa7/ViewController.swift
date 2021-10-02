@@ -11,7 +11,7 @@ import Moya
 
 class ViewController: UIViewController {
     let nasaProvider = MoyaProvider <OpenNasaRoute>()
-    var apodModels: [ApodModel] = [ ]
+    var apodModels: [ApodModel] = []
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
