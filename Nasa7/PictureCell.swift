@@ -58,13 +58,13 @@ class PictureCell: UITableViewCell {
                     self.delegate?.pictureCell(self, needsUpdateWith: {
                         [weak self] in
                         guard let self = self else {return}
-                    })
                     self.imageOfTheWeek.image = image
                     let aspectRatio = image.size.height / image.size.width
                     // swiftlint:disable:next line_length
                     let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
                     self.aspectRatioConstraint = aspectRatioConstraint
                     self.imageOfTheWeek.image = image
+                    })
                 } catch {
                     print(error)
                 }

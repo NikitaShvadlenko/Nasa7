@@ -15,7 +15,7 @@ enum NasaImageRoute {
 extension NasaImageRoute: TargetType {
     var baseURL: URL {
         switch self {
-        // Почему case let? 
+        // Почему case let? - потому что case.image (let url) - enum, штрихкоды
         case let .image(url):
             return url
         }
@@ -33,3 +33,5 @@ extension NasaImageRoute: TargetType {
         return nil
     }
 }
+
+

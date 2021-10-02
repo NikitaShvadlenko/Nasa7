@@ -11,7 +11,7 @@ import Moya
 
 class ViewController: UIViewController {
     let nasaProvider = MoyaProvider <OpenNasaRoute>()
-    var apodModels: [ApodModel] = []
+    var apodModels: [ApodModel] = [ ]
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         }
     }
     func fetchData() {
-        nasaProvider.request(.apod) {[weak self] result in
+        nasaProvider.request(.apod(count: 2)) {[weak self] result in
             switch result {
             case let .success(response):
             do {
