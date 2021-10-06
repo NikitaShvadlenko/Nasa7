@@ -11,7 +11,7 @@ import Moya
 
 class ViewController: UIViewController {
     let nasaProvider = MoyaProvider <OpenNasaRoute>()
-    var apodModels: [ApodModel] = []
+    var apodModels: ApodModel?
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
@@ -35,11 +35,11 @@ class ViewController: UIViewController {
         }
     }
     func fetchData() {
-        nasaProvider.request(.apod(count: 2)) {[weak self] result in
+        nasaProvider.request(.apod) {[weak self] result in
             switch result {
             case let .success(response):
             do {
-                let apodModels = try response.map([ApodModel].self)
+                let apodModels = try response.map(ApodModel.self)
                 self?.apodModels = apodModels
                 self?.tableView.reloadData()
             } catch {
@@ -55,11 +55,11 @@ class ViewController: UIViewController {
 
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return apodModels.count
+        return 1
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(PictureCell.self)", for: indexPath) as? PictureCell
-        let model = apodModels[indexPath.row]
+        guard let model = apodModels else { fatalError ("Did not make a call to API") }
         cell?.configure(model: model, delegate: self)
         guard let safeCell = cell else {
             fatalError("Can not deque Cell")
