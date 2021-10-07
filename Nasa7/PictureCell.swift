@@ -18,7 +18,22 @@ class PictureCell: UITableViewCell {
         imageOfTheWeek.backgroundColor = .yellow
         return imageOfTheWeek
     }()
-    // Как didset работает вложенная в lazy var? в каком порядке идет этот код?
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.color = .red
+        indicator.style = .large
+        return indicator
+    }()
+    
+    private lazy var activityIndicatorContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .purple
+        view.layer.cornerRadius = 4
+        view.isHidden = true
+        return view
+    }()
+    // в каком порядке идет этот код? Откуда он берет oldValue
     private var aspectRatioConstraint: NSLayoutConstraint? {
         didSet {
             if let oldConstraint = oldValue {
@@ -42,14 +57,26 @@ class PictureCell: UITableViewCell {
     override func prepareForReuse() {
         imageOfTheWeek.image = nil
         aspectRatioConstraint = nil
+        setActivityIndicatorHidden(true)
     }
     func configure(model: ApodModel, delegate: PictureCellDelegate) {
         self.delegate = delegate
         loadImage(url: model.url)
     }
+    func setActivityIndicatorHidden (_ hidden: Bool) {
+        activityIndicatorContainer.isHidden = hidden
+        if hidden {
+            activityIndicator.stopAnimating()
+        }
+        else {
+            activityIndicator.startAnimating()
+        }
+    }
     func loadImage(url: URL) {
+        setActivityIndicatorHidden(false)
         imageProvider.request(.image(url: url)) { [weak self] result in
             guard let self = self else { return }
+            self.setActivityIndicatorHidden(true)
             switch result {
             case let .success(response):
                 do {
@@ -78,8 +105,17 @@ class PictureCell: UITableViewCell {
 private extension PictureCell {
     func setupView() {
         contentView.addSubview(imageOfTheWeek)
+        contentView.addSubview(activityIndicatorContainer)
         imageOfTheWeek.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.height.greaterThanOrEqualTo(100)
+            make.leading.trailing.equalToSuperview().inset(8)
+            make.top.equalToSuperview().offset(4)
+            make.bottom.equalToSuperview().inset(4).priority(.high)
+            
+            activityIndicatorContainer.snp.makeConstraints { make in
+                make.edges.equalTo(imageOfTheWeek)
+                make.center.equalToSuperview()
+            }
         }
     }
 }
