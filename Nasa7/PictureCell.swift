@@ -21,7 +21,7 @@ class PictureCell: UITableViewCell {
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView()
-        indicator.color = .red
+        indicator.color = .white
         indicator.style = .large
         return indicator
     }()
@@ -106,6 +106,7 @@ private extension PictureCell {
     func setupView() {
         contentView.addSubview(imageOfTheWeek)
         contentView.addSubview(activityIndicatorContainer)
+        activityIndicatorContainer.addSubview(activityIndicator)
         imageOfTheWeek.snp.makeConstraints { make in
             make.height.greaterThanOrEqualTo(100)
             make.leading.trailing.equalToSuperview().inset(8)
@@ -113,8 +114,11 @@ private extension PictureCell {
             make.bottom.equalToSuperview().inset(4).priority(.high)
             
             activityIndicatorContainer.snp.makeConstraints { make in
-                make.edges.equalTo(imageOfTheWeek)
                 make.center.equalToSuperview()
+                make.edges.equalTo(imageOfTheWeek)
+                activityIndicator.snp.makeConstraints { make in
+                    make.edges.equalToSuperview()
+                }
             }
         }
     }
