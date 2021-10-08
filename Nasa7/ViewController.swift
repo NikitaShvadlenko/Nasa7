@@ -12,14 +12,30 @@ import Moya
 class ViewController: UIViewController {
     let nasaProvider = MoyaProvider <OpenNasaRoute>()
     var apodModels: [ApodModel] = []
+    var isFetchingData = false
+    var requestedMoreDatesCount = 1
+    private var calendar = Calendar.current
+    private lazy var dateFormatter: DateFormatter = {
+        let dateFormater = DateFormatter()
+        dateFormater.dateFormat = "YYYY-MM-dd"
+        return dateFormater
+    }()
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
         tableView.rowHeight = UITableView.automaticDimension
         tableView.dataSource = self
         tableView.register(PictureCell.self, forCellReuseIdentifier: "\(PictureCell.self)")
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
         return tableView
        }()
+    private lazy var currentDateString: String = {
+        return dateFormatter.string(from: calendar.date(byAdding: .day, value: -1, to: Date())!)
+    }()
+    private lazy var lastWeekDateString: String = {
+        return dateFormatter.string(from: calendar.date(byAdding: .weekOfYear, value: -1, to: Date())!)
+    }()
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
@@ -34,8 +50,16 @@ class ViewController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
+    func getNewDates()  {
+        var lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1 * requestedMoreDatesCount, to: Date())!
+        let currentDate = lastWeekDate
+        lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1 * requestedMoreDatesCount, to: Date())!
+        currentDateString = (dateFormatter.string(from: currentDate))
+        lastWeekDateString = (dateFormatter.string(from: lastWeekDate))
+        requestedMoreDatesCount += 1
+    }
     func fetchData() {
-        nasaProvider.request(.apod(count: 2)) {[weak self] result in
+        nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
             switch result {
             case let .success(response):
             do {
@@ -74,5 +98,26 @@ extension ViewController: PictureCellDelegate {
         tableView.beginUpdates()
         closure()
         tableView.endUpdates()
+    }
+}
+//MARK: - InfiniteScroll
+ extension ViewController: UITableViewDelegate{
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        print(offsetY)
+        print(contentHeight)
+        if offsetY > contentHeight - scrollView.frame.height {
+            if !isFetchingData {
+                fetchMoreData()
+            }
+        }
+    }
+    func fetchMoreData() {
+        isFetchingData = true
+        print("Aked for more data")
+        getNewDates()
+        fetchData()
+        isFetchingData = false
     }
 }

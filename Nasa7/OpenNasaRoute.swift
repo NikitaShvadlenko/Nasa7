@@ -10,7 +10,8 @@ import Moya
 
 // Enum тут на случай, если я захочу чем-нибудь еще воспользоваться из наса АПИ
 enum OpenNasaRoute {
-    case apod (count: Int)
+    case apod (start_date: String,
+               end_date: String)
 }
 
 extension OpenNasaRoute: TargetType {
@@ -34,10 +35,11 @@ extension OpenNasaRoute: TargetType {
     var task: Task {
         switch self {
         // Опять использую case let потому что я тут СОЗДАЮ аргумент функции
-        case let .apod(count):
+        case let .apod(start_date, end_date):
             let parameters: [String: Any] = [
                 "api_key": "DEMO_KEY",
-                "count": count
+                "start_date": start_date,
+                "end_date": end_date
             ]
             // не запомнил, но понимаю, почему тут такой тип кодировки.
             return .requestParameters(parameters: parameters, encoding: URLEncoding.queryString)

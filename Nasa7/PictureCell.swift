@@ -31,6 +31,8 @@ class PictureCell: UITableViewCell {
         view.backgroundColor = .purple
         view.layer.cornerRadius = 4
         view.isHidden = true
+        view.addSubview(activityIndicator)
+        activityIndicator.center = view.center
         return view
     }()
     // в каком порядке идет этот код? Откуда он берет oldValue
@@ -86,11 +88,10 @@ class PictureCell: UITableViewCell {
                         [weak self] in
                         guard let self = self else {return}
                     self.imageOfTheWeek.image = image
-                    let aspectRatio = image.size.height / image.size.width
-                    // swiftlint:disable:next line_length
-                    let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                    self.aspectRatioConstraint = aspectRatioConstraint
-                    self.imageOfTheWeek.image = image
+                        let aspectRatio = image.size.height / image.size.width
+                        let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
+                        self.aspectRatioConstraint = aspectRatioConstraint
+                        self.imageOfTheWeek.image = image
                     })
                 } catch {
                     print(error)
@@ -107,19 +108,16 @@ private extension PictureCell {
         contentView.addSubview(imageOfTheWeek)
         contentView.addSubview(activityIndicatorContainer)
         activityIndicatorContainer.addSubview(activityIndicator)
-        imageOfTheWeek.snp.makeConstraints { make in
-            make.height.greaterThanOrEqualTo(100)
+        imageOfTheWeek.snp.makeConstraints { (make: ConstraintMaker) in
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().inset(4).priority(.high)
-            
-            activityIndicatorContainer.snp.makeConstraints { make in
-                make.center.equalToSuperview()
-                make.edges.equalTo(imageOfTheWeek)
-                activityIndicator.snp.makeConstraints { make in
-                    make.edges.equalToSuperview()
-                }
-            }
+            make.height.greaterThanOrEqualTo(60)
+        }
+        
+        activityIndicatorContainer.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.height.width.equalTo(imageOfTheWeek)
         }
     }
 }
