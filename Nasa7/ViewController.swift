@@ -105,10 +105,10 @@ extension ViewController: PictureCellDelegate {
 extension ViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height + 100
+        let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
-        if offsetY > contentHeight - scrollView.frame.height {
+        if offsetY > contentHeight - scrollView.frame.height + 100{
             if !isFetchingData {
                 fetchMoreData()
             }
