@@ -16,6 +16,8 @@ class PictureCell: UITableViewCell {
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
         imageOfTheWeek.backgroundColor = .yellow
+        imageOfTheWeek.contentMode = .scaleAspectFit
+        imageOfTheWeek.clipsToBounds = true
         return imageOfTheWeek
     }()
     

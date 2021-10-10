@@ -23,8 +23,8 @@ class ViewController: UIViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .blue
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.register(PictureCell.self, forCellReuseIdentifier: "\(PictureCell.self)")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
@@ -100,12 +100,12 @@ extension ViewController: PictureCellDelegate {
         tableView.endUpdates()
     }
 }
+
 //MARK: - InfiniteScroll
- extension ViewController: UITableViewDelegate{
+extension ViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print("Scroll View did scroll")
         let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
+        let contentHeight = scrollView.contentSize.height + 100
         print(offsetY)
         print(contentHeight)
         if offsetY > contentHeight - scrollView.frame.height {
@@ -113,13 +113,12 @@ extension ViewController: PictureCellDelegate {
                 fetchMoreData()
             }
         }
-    }
-    func fetchMoreData() {
-        print("Asked more")
-        isFetchingData = true
-        print("Aked for more data")
-        getNewDates()
-        fetchData()
-        isFetchingData = false
+        func fetchMoreData() {
+            isFetchingData = true
+            print("Aked for more data")
+            getNewDates()
+            fetchData()
+            isFetchingData = false
+        }
     }
 }
