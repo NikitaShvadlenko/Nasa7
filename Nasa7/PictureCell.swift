@@ -57,9 +57,9 @@ class PictureCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     override func prepareForReuse() {
-        imageOfTheWeek.image = nil
         aspectRatioConstraint = nil
         setActivityIndicatorHidden(true)
+        imageOfTheWeek.image = nil
     }
     func configure(model: ApodModel, delegate: PictureCellDelegate) {
         self.delegate = delegate

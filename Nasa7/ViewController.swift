@@ -51,7 +51,7 @@ class ViewController: UIViewController {
         }
     }
     func getNewDates()  {
-        var lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1 * requestedMoreDatesCount, to: Date())!
+        var lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1, to: Date())!
         let currentDate = lastWeekDate
         lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1 * requestedMoreDatesCount, to: Date())!
         currentDateString = (dateFormatter.string(from: currentDate))
@@ -103,6 +103,7 @@ extension ViewController: PictureCellDelegate {
 //MARK: - InfiniteScroll
  extension ViewController: UITableViewDelegate{
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print("Scroll View did scroll")
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
@@ -114,6 +115,7 @@ extension ViewController: PictureCellDelegate {
         }
     }
     func fetchMoreData() {
+        print("Asked more")
         isFetchingData = true
         print("Aked for more data")
         getNewDates()
