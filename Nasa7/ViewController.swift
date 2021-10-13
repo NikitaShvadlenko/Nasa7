@@ -41,6 +41,7 @@ class ViewController: UIViewController {
         setupViews()
         fetchData {
             isFetchingData = false
+            print (isFetchingData)
         }
     }
     private func setupViews() {
@@ -110,7 +111,8 @@ extension ViewController: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
-        if offsetY > contentHeight * 0.25 - scrollView.frame.height {
+        if offsetY > contentHeight - scrollView.frame.height + 200
+        {
             if !isFetchingData {
                 print("should give more now")
                 fetchMoreData()
