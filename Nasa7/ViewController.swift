@@ -12,7 +12,7 @@ import Moya
 class ViewController: UIViewController {
     let nasaProvider = MoyaProvider <OpenNasaRoute>()
     var apodModels: [ApodModel] = []
-    var isFetchingData = false
+    var isFetchingData = true
     var requestedMoreDatesCount = 1
     private var calendar = Calendar.current
     private lazy var dateFormatter: DateFormatter = {
@@ -39,7 +39,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        fetchData()
+        fetchData {
+            isFetchingData = false
+        }
     }
     private func setupViews() {
         tabBarItem.image = UIImage(systemName: "list.bullet")
@@ -58,7 +60,7 @@ class ViewController: UIViewController {
         lastWeekDateString = (dateFormatter.string(from: lastWeekDate))
         requestedMoreDatesCount += 1
     }
-    func fetchData() {
+    func fetchData(completion: () -> Void) {
         nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
             switch result {
             case let .success(response):
@@ -108,17 +110,24 @@ extension ViewController: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
-        if offsetY > contentHeight - scrollView.frame.height + 100{
+        if offsetY > contentHeight * 0.25 - scrollView.frame.height {
             if !isFetchingData {
+                print("should give more now")
                 fetchMoreData()
             }
         }
         func fetchMoreData() {
+            print("is giving more now")
             isFetchingData = true
-            print("Aked for more data")
             getNewDates()
-            fetchData()
+            fetchData {
             isFetchingData = false
+            }
         }
     }
 }
+extension ViewController {
+
+}
+
+

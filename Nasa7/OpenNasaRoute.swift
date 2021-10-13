@@ -37,7 +37,7 @@ extension OpenNasaRoute: TargetType {
         // Опять использую case let потому что я тут СОЗДАЮ аргумент функции
         case let .apod(start_date, end_date):
             let parameters: [String: Any] = [
-                "api_key": "DEMO_KEY",
+                "api_key": "2Mito0IFexJK9pmjgAQyRVy6WpMvJLokRCchXi7i",
                 "start_date": start_date,
                 "end_date": end_date
             ]
