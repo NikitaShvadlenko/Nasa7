@@ -118,16 +118,18 @@ extension ViewController: UITableViewDelegate {
                 fetchMoreData()
             }
         }
-        func fetchMoreData() {
-            print("is giving more now")
-            isFetchingData = true
-            getNewDates()
-            fetchData {
-            isFetchingData = false
-            }
+    }
+
+    func fetchMoreData() {
+        print("is giving more now")
+        isFetchingData = true
+        updateDates()
+        fetchData {
+        isFetchingData = false
         }
     }
 }
+
 extension ViewController {
 
 }
