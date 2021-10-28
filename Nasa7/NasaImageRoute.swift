@@ -14,21 +14,26 @@ enum NasaImageRoute {
 
 extension NasaImageRoute: TargetType {
     var baseURL: URL {
-        switch self {
+        
+    switch self {
         // Почему case let? - потому что case.image (let url) - enum, штрихкоды
-        case let .image(url):
-            return url
+    case let .image(url):
+        return url
         }
     }
+    
     var path: String {
         ""
     }
+    
     var method: Moya.Method {
         return .get
     }
+    
     var task: Task {
         .requestPlain
     }
+    
     var headers: [String: String]? {
         return nil
     }
