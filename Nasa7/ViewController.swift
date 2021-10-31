@@ -114,10 +114,8 @@ extension ViewController: UITableViewDelegate {
         if offsetY > contentHeight - scrollView.frame.height + 200
         {
             if isFetchingData {return}
-            else {
-                print("should give more now")
-                fetchMoreData()
-            }
+            print("should give more now")
+            fetchMoreData()
         }
         func fetchMoreData() {
             print("is giving more now")
