@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     var requestedMoreDatesCount = 1
     
     private var calendar = Calendar.current
+    
     private lazy var dateFormatter: DateFormatter = {
         let dateFormater = DateFormatter()
         dateFormater.dateFormat = "YYYY-MM-dd"
@@ -26,6 +27,7 @@ class ViewController: UIViewController {
     private lazy var currentDateString: String = {
         return dateFormatter.string(from: calendar.date(byAdding: .day, value: -1, to: Date())!)
     }()
+    
     private lazy var lastWeekDateString: String = {
         return dateFormatter.string(from: calendar.date(byAdding: .weekOfYear, value: -1, to: Date())!)
     }()
@@ -101,7 +103,6 @@ extension ViewController: UITableViewDataSource {
         guard let safeCell = cell else {
             fatalError("Can not deque Cell")
         }
-        
         return safeCell
     }
 }
