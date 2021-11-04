@@ -29,7 +29,7 @@ class ViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
         return tableView
-       }()
+    }()
     private lazy var currentDateString: String = {
         return dateFormatter.string(from: calendar.date(byAdding: .day, value: -1, to: Date())!)
     }()
@@ -65,13 +65,13 @@ class ViewController: UIViewController {
         nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
             switch result {
             case let .success(response):
-            do {
-                let apodModels = try response.map([ApodModel].self)
-                self?.apodModels = apodModels
-                self?.tableView.reloadData()
-            } catch {
-                print(error)
-            }
+                do {
+                    let apodModels = try response.map([ApodModel].self)
+                    self?.apodModels = apodModels
+                    self?.tableView.reloadData()
+                } catch {
+                    print(error)
+                }
             case .failure(let error):
                 print(error)
             }
@@ -125,13 +125,13 @@ extension ViewController: UITableViewDelegate {
         isFetchingData = true
         getNewDates()
         fetchData {
-        isFetchingData = false
+            isFetchingData = false
         }
     }
-    
 }
-extension ViewController {
 
+extension ViewController {
+    
 }
 
 
