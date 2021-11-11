@@ -39,7 +39,7 @@ class PictureCell: UITableViewCell {
         activityIndicator.center = view.center
         return view
     }()
-    // в каком порядке идет этот код? Откуда он берет oldValue
+
     private var aspectRatioConstraint: NSLayoutConstraint? {
         didSet {
             if let oldConstraint = oldValue {
@@ -93,8 +93,18 @@ class PictureCell: UITableViewCell {
             case let .success(response):
                 do {
                     let image = try response.mapImage()
-                    // Зачем этот код?
-                    self.delegate?.pictureCell(self, needsUpdateWith: {
+                    //Хочу вместо этого сделать фиксированные размеры клеток, но при этом сохранять aspect ratio.
+                    /*
+                    
+                     1) Загрузить картинку в бэкграунде.
+                     2) При завершении использовать func resized image
+                     3) Сделать картинку прямоугольником с фиксированными высотой и шириной (Или добавить этот функционал в resized image уже сразу) с сохранением пропорций.
+                     4) В Главном потоке присвоить картинку.
+                     
+                     Заново читать про потоки.
+                     
+                     */
+                    /*self.delegate?.pictureCell(self, needsUpdateWith: {
                         [weak self] in
                         guard let self = self else {return}
                     self.imageOfTheWeek.image = image
@@ -102,13 +112,25 @@ class PictureCell: UITableViewCell {
                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
                         self.aspectRatioConstraint = aspectRatioConstraint
                         self.imageOfTheWeek.image = image
-                    })
+                    }) */
+                    
                 } catch {
                     print(error)
                 }
             case let .failure(error):
                 print(error)
             }
+        }
+    }
+    
+    func resizedImage(at url: URL, for size: CGSize) -> UIImage? {
+        guard let image = UIImage(contentsOfFile: url.path) else {
+            return nil
+        }
+        
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { (context) in
+            image.draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }
