@@ -18,15 +18,19 @@ extension NasaImageRoute: TargetType {
             return url
         }
     }
+    
     var path: String {
         ""
     }
+    
     var method: Moya.Method {
         return .get
     }
+    
     var task: Task {
         .requestPlain
     }
+    
     var headers: [String: String]? {
         return nil
     }

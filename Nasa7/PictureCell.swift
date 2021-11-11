@@ -8,10 +8,12 @@
 import UIKit
 import SnapKit
 import Moya
+
 protocol PictureCellDelegate: AnyObject {
     // Зачем Этот протокол?
     func pictureCell(_ pictureCell: PictureCell, needsUpdateWith closure:() -> Void)
 }
+
 class PictureCell: UITableViewCell {
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
@@ -48,6 +50,7 @@ class PictureCell: UITableViewCell {
             }
         }
     }
+    
     private weak var delegate: PictureCellDelegate?
     // Откуда NASA image route Берет данные OpenNasaRoute?
     let imageProvider = MoyaProvider<NasaImageRoute>()
@@ -55,18 +58,22 @@ class PictureCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     override func prepareForReuse() {
         aspectRatioConstraint = nil
         setActivityIndicatorHidden(true)
         imageOfTheWeek.image = nil
     }
+    
     func configure(model: ApodModel, delegate: PictureCellDelegate) {
         self.delegate = delegate
         loadImage(url: model.url)
     }
+    
     func setActivityIndicatorHidden (_ hidden: Bool) {
         activityIndicatorContainer.isHidden = hidden
         if hidden {
@@ -76,6 +83,7 @@ class PictureCell: UITableViewCell {
             activityIndicator.startAnimating()
         }
     }
+    
     func loadImage(url: URL) {
         setActivityIndicatorHidden(false)
         imageProvider.request(.image(url: url)) { [weak self] result in
