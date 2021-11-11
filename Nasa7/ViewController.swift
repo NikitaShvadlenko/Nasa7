@@ -53,7 +53,7 @@ class ViewController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
-    func getNewDates()  {
+    func updateDates()  {
         var lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1, to: Date())!
         let currentDate = lastWeekDate
         lastWeekDate = calendar.date(byAdding: .weekOfYear, value: -1 * requestedMoreDatesCount, to: Date())!
@@ -117,7 +117,6 @@ extension ViewController: UITableViewDelegate {
                 fetchMoreData()
             }
         }
-    }
     
     func fetchMoreData() {
         print("is giving more now")
