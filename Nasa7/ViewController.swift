@@ -111,7 +111,7 @@ extension ViewController: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
-        if isFetchingData {return}
+        if isFetchingData { return }
         if offsetY > contentHeight - scrollView.frame.height + 200 {
             print("should give more now")
             fetchMoreData()
