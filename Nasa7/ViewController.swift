@@ -46,10 +46,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        fetchData {
-            isFetchingData = false
-            print (isFetchingData)
-        }
+        fetchData ()
     }
     
     private func setupViews() {
@@ -71,7 +68,7 @@ class ViewController: UIViewController {
         requestedMoreDatesCount += 1
     }
     
-    func fetchData(completion: () -> Void) {
+    func fetchData() {
         nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
             switch result {
             case let .success(response):
@@ -123,20 +120,18 @@ extension ViewController: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
-        if offsetY > contentHeight - scrollView.frame.height + 200 {
+        if offsetY > contentHeight - scrollView.frame.height {
             if !isFetchingData {
-                print("should give more now")
-                fetchMoreData()
+                fetchMoreData(completion: {isFetchingData = false; print("Complete.")})
             }
         }
         
-        func fetchMoreData() {
-            print("is giving more now")
+        func fetchMoreData(completion: () -> Void) {
+            print("Fetching more data/")
             isFetchingData = true
             getNewDates()
-            fetchData {
-            isFetchingData = false
-        }
+            fetchData()
+            completion()
     }
 }
 }
