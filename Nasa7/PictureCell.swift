@@ -4,7 +4,7 @@
 //
 //  Created by Nikita Shvad on 26.09.2021.
 //
-
+import AVFoundation
 import UIKit
 import SnapKit
 import Moya
@@ -87,12 +87,27 @@ class PictureCell: UITableViewCell {
     func loadImage(url: URL) {
         setActivityIndicatorHidden(false)
         imageProvider.request(.image(url: url)) { [weak self] result in
+            
             guard let self = self else { return }
             self.setActivityIndicatorHidden(true)
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+    
             switch result {
             case let .success(response):
                 do {
                     let image = try response.mapImage()
+                    let size = CGSize(width: 300, height: 300)
+                    let downsampledImage = self.resizedImage(image: image, for: size)
+                    //Extra Trailing closure тут ошибка.
+                    DispatchQueue.main.async {
+                        let aspectRatio = downsampledImage!.size.height / downsampledImage!.size.width
+                            let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
+                            self.aspectRatioConstraint = aspectRatioConstraint
+                            self.imageOfTheWeek.image = downsampledImage
+                        }
+                    
+                    
                     //Хочу вместо этого сделать фиксированные размеры клеток, но при этом сохранять aspect ratio.
                     /*
                     
@@ -104,9 +119,7 @@ class PictureCell: UITableViewCell {
                      Заново читать про потоки.
                      
                      */
-                    /*self.delegate?.pictureCell(self, needsUpdateWith: {
-                        [weak self] in
-                        guard let self = self else {return}
+                    /*
                     self.imageOfTheWeek.image = image
                         let aspectRatio = image.size.height / image.size.width
                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
@@ -121,13 +134,10 @@ class PictureCell: UITableViewCell {
                 print(error)
             }
         }
+        }
     }
     
-    func resizedImage(at url: URL, for size: CGSize) -> UIImage? {
-        guard let image = UIImage(contentsOfFile: url.path) else {
-            return nil
-        }
-        
+    func resizedImage(image: Image, for size: CGSize) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { (context) in
             image.draw(in: CGRect(origin: .zero, size: size))
