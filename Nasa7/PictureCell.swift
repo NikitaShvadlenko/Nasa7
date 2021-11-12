@@ -97,13 +97,12 @@ class PictureCell: UITableViewCell {
             case let .success(response):
                 do {
                     let image = try response.mapImage()
+                    //Рамер не важен он просто помещает картинку в клетку, созданную оригинальным размером activity indicator.
+                    //avmakerect тоже нужен. 
                     let size = CGSize(width: 300, height: 300)
                     let downsampledImage = self.resizedImage(image: image, for: size)
                     //Extra Trailing closure тут ошибка.
                     DispatchQueue.main.async {
-                        let aspectRatio = downsampledImage!.size.height / downsampledImage!.size.width
-                            let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                            self.aspectRatioConstraint = aspectRatioConstraint
                             self.imageOfTheWeek.image = downsampledImage
                         }
                     
