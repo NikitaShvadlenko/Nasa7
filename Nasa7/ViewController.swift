@@ -123,11 +123,12 @@ extension ViewController: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         print(offsetY)
         print(contentHeight)
+
+        if isFetchingData { return }
         if offsetY > contentHeight - scrollView.frame.height + 200 {
-            if !isFetchingData {
-                print("should give more now")
-                fetchMoreData()
-            }
+            print("should give more now")
+            fetchMoreData()
+
         }
         
         func fetchMoreData() {
