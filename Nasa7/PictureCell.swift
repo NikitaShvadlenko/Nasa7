@@ -39,7 +39,7 @@ class PictureCell: UITableViewCell {
         activityIndicator.center = view.center
         return view
     }()
-
+    
     private var aspectRatioConstraint: NSLayoutConstraint? {
         didSet {
             if let oldConstraint = oldValue {
@@ -54,6 +54,7 @@ class PictureCell: UITableViewCell {
     private weak var delegate: PictureCellDelegate?
     // Откуда NASA image route Берет данные OpenNasaRoute?
     let imageProvider = MoyaProvider<NasaImageRoute>()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
@@ -92,47 +93,32 @@ class PictureCell: UITableViewCell {
             self.setActivityIndicatorHidden(true)
             
             DispatchQueue.global(qos: .userInitiated).async {
-    
-            switch result {
-            case let .success(response):
-                do {
-                    let image = try response.mapImage()
-                    //Рамер не важен он просто помещает картинку в клетку, созданную оригинальным размером activity indicator.
-                    //avmakerect тоже нужен. 
-                    let size = CGSize(width: 300, height: 300)
-                    let downsampledImage = self.resizedImage(image: image, for: size)
-                    //Extra Trailing closure тут ошибка.
-                    DispatchQueue.main.async {
+                switch result {
+                case let .success(response):
+                    do {
+                        let image = try response.mapImage()
+                        let size = CGSize(width: 300, height: 350)
+                        let downsampledImage = self.resizedImage(image: image, for: size)
+                        DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage
                         }
-                    
-                    
-                    //Хочу вместо этого сделать фиксированные размеры клеток, но при этом сохранять aspect ratio.
-                    /*
-                    
-                     1) Загрузить картинку в бэкграунде.
-                     2) При завершении использовать func resized image
-                     3) Сделать картинку прямоугольником с фиксированными высотой и шириной (Или добавить этот функционал в resized image уже сразу) с сохранением пропорций.
-                     4) В Главном потоке присвоить картинку.
-                     
-                     Заново читать про потоки.
-                     
-                     */
-                    /*
-                    self.imageOfTheWeek.image = image
-                        let aspectRatio = image.size.height / image.size.width
-                        let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                        self.aspectRatioConstraint = aspectRatioConstraint
-                        self.imageOfTheWeek.image = image
-                    }) */
-                    
-                } catch {
+                        /*
+                         Этот код можно заменить на AVMakeRenct и поместить в main поток.
+                         Сейчас размер клеток фиксированный, но можно делать отностельно высоты загруженной картинки.
+                         self.imageOfTheWeek.image = image
+                         let aspectRatio = image.size.height / image.size.width
+                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
+                         self.aspectRatioConstraint = aspectRatioConstraint
+                         self.imageOfTheWeek.image = image
+                         */
+                        
+                    } catch {
+                        print(error)
+                    }
+                case let .failure(error):
                     print(error)
                 }
-            case let .failure(error):
-                print(error)
             }
-        }
         }
     }
     
@@ -153,7 +139,7 @@ private extension PictureCell {
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().inset(4).priority(.high)
-            make.height.greaterThanOrEqualTo(60)
+            make.height.greaterThanOrEqualTo(350)
         }
         
         activityIndicatorContainer.snp.makeConstraints { make in
