@@ -15,10 +15,11 @@ protocol PictureCellDelegate: AnyObject {
 }
 
 class PictureCell: UITableViewCell {
+
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
         imageOfTheWeek.backgroundColor = .yellow
-        imageOfTheWeek.contentMode = .scaleAspectFit
+        imageOfTheWeek.contentMode = .scaleToFill
         imageOfTheWeek.clipsToBounds = true
         return imageOfTheWeek
     }()
@@ -97,7 +98,7 @@ class PictureCell: UITableViewCell {
                 case let .success(response):
                     do {
                         let image = try response.mapImage()
-                        let size = CGSize(width: 300, height: 350)
+                        let size = CGSize(width: image.size.width, height: image.size.height)
                         let downsampledImage = self.resizedImage(image: image, for: size)
                         DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage
