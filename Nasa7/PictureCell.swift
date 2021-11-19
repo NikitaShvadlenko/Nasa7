@@ -4,7 +4,7 @@
 //
 //  Created by Nikita Shvad on 26.09.2021.
 //
-
+import AVFoundation
 import UIKit
 import SnapKit
 import Moya
@@ -15,10 +15,11 @@ protocol PictureCellDelegate: AnyObject {
 }
 
 class PictureCell: UITableViewCell {
+
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
         imageOfTheWeek.backgroundColor = .yellow
-        imageOfTheWeek.contentMode = .scaleAspectFit
+        imageOfTheWeek.contentMode = .scaleToFill
         imageOfTheWeek.clipsToBounds = true
         return imageOfTheWeek
     }()
@@ -39,7 +40,7 @@ class PictureCell: UITableViewCell {
         activityIndicator.center = view.center
         return view
     }()
-    // в каком порядке идет этот код? Откуда он берет oldValue
+    
     private var aspectRatioConstraint: NSLayoutConstraint? {
         didSet {
             if let oldConstraint = oldValue {
@@ -54,6 +55,7 @@ class PictureCell: UITableViewCell {
     private weak var delegate: PictureCellDelegate?
     // Откуда NASA image route Берет данные OpenNasaRoute?
     let imageProvider = MoyaProvider<NasaImageRoute>()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
@@ -87,28 +89,44 @@ class PictureCell: UITableViewCell {
     func loadImage(url: URL) {
         setActivityIndicatorHidden(false)
         imageProvider.request(.image(url: url)) { [weak self] result in
+            
             guard let self = self else { return }
             self.setActivityIndicatorHidden(true)
-            switch result {
-            case let .success(response):
-                do {
-                    let image = try response.mapImage()
-                    // Зачем этот код?
-                    self.delegate?.pictureCell(self, needsUpdateWith: {
-                        [weak self] in
-                        guard let self = self else {return}
-                    self.imageOfTheWeek.image = image
-                        let aspectRatio = image.size.height / image.size.width
-                        let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                        self.aspectRatioConstraint = aspectRatioConstraint
-                        self.imageOfTheWeek.image = image
-                    })
-                } catch {
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                switch result {
+                case let .success(response):
+                    do {
+                        let image = try response.mapImage()
+                        let size = CGSize(width: image.size.width, height: image.size.height)
+                        let downsampledImage = self.resizedImage(image: image, for: size)
+                        DispatchQueue.main.async {
+                            self.imageOfTheWeek.image = downsampledImage
+                        }
+                        /*
+                         Этот код можно заменить на AVMakeRenct и поместить в main поток.
+                         Сейчас размер клеток фиксированный, но можно делать отностельно высоты загруженной картинки.
+                         self.imageOfTheWeek.image = image
+                         let aspectRatio = image.size.height / image.size.width
+                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
+                         self.aspectRatioConstraint = aspectRatioConstraint
+                         self.imageOfTheWeek.image = image
+                         */
+                        
+                    } catch {
+                        print(error)
+                    }
+                case let .failure(error):
                     print(error)
                 }
-            case let .failure(error):
-                print(error)
             }
+        }
+    }
+    
+    func resizedImage(image: Image, for size: CGSize) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { (context) in
+            image.draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }
@@ -122,7 +140,7 @@ private extension PictureCell {
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().inset(4).priority(.high)
-            make.height.greaterThanOrEqualTo(60)
+            make.height.greaterThanOrEqualTo(350)
         }
         
         activityIndicatorContainer.snp.makeConstraints { make in
