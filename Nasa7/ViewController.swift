@@ -46,10 +46,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        fetchData {
-            self.isFetchingData = false
-            print ("Is fetching data = ", self.isFetchingData)
-        }
+        fetchData ()
     }
     
     private func setupViews() {
@@ -71,25 +68,19 @@ class ViewController: UIViewController {
         requestedMoreDatesCount += 1
     }
     
-    func fetchData(completion: @escaping () -> Void) {
+    func fetchData() {
         nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
-            self?.isFetchingData = true
-            DispatchQueue.global().async {
-                switch result {
-                case let .success(response):
-                    do {
-                        let apodModels = try response.map([ApodModel].self)
-                        self?.apodModels = apodModels
-                        DispatchQueue.main.async {
-                            self?.tableView.reloadData()
-                            completion()
-                        }
-                    } catch {
-                        print(error)
-                    }
-                case .failure(let error):
+            switch result {
+            case let .success(response):
+                do {
+                    let apodModels = try response.map([ApodModel].self)
+                    self?.apodModels = apodModels
+                    self?.tableView.reloadData()
+                } catch {
                     print(error)
                 }
+            case .failure(let error):
+                print(error)
             }
         }
     }
@@ -127,17 +118,20 @@ extension ViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
-        print(offsetY + scrollView.frame.height)
+        print(offsetY)
         print(contentHeight)
-        if offsetY + (scrollView.frame.height) > contentHeight {
+        if offsetY > contentHeight - scrollView.frame.height {
             if !isFetchingData {
-                getNewDates()
-                fetchData {
-                    self.isFetchingData = false
-                    print ("LOADED MORE DATA")
-                }
+                fetchMoreData(completion: {isFetchingData = false; print("Complete.")})
             }
         }
         
+        func fetchMoreData(completion: () -> Void) {
+            print("Fetching more data/")
+            isFetchingData = true
+            getNewDates()
+            fetchData()
+            completion()
     }
+}
 }
