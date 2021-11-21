@@ -70,17 +70,23 @@ class ViewController: UIViewController {
     
     func fetchData() {
         nasaProvider.request(.apod(start_date: lastWeekDateString, end_date: currentDateString)) {[weak self] result in
-            switch result {
-            case let .success(response):
-                do {
-                    let apodModels = try response.map([ApodModel].self)
-                    self?.apodModels = apodModels
-                    self?.tableView.reloadData()
-                } catch {
+            self?.isFetchingData = true
+            DispatchQueue.global().async {
+                switch result {
+                case let .success(response):
+                    do {
+                        let apodModels = try response.map([ApodModel].self)
+                        self?.apodModels = apodModels
+                        DispatchQueue.main.async {
+                            self?.tableView.reloadData()
+                        }
+                    } catch {
+                        print(error)
+                    }
+                case .failure(let error):
                     print(error)
                 }
-            case .failure(let error):
-                print(error)
+                completion()
             }
         }
     }
