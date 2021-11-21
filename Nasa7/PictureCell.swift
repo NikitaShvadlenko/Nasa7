@@ -16,6 +16,8 @@ protocol PictureCellDelegate: AnyObject {
 
 class PictureCell: UITableViewCell {
 
+    let cacheProvider = CacheProvider()
+    
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
         imageOfTheWeek.backgroundColor = .yellow
@@ -87,6 +89,14 @@ class PictureCell: UITableViewCell {
     }
     
     func loadImage(url: URL) {
+        
+        if let imageData = cacheProvider.retrieve(key: url.absoluteString) {
+            let image = UIImage(data: imageData)
+            imageOfTheWeek.image = image
+            print("image retrieved from cache")
+            return
+        }
+        
         setActivityIndicatorHidden(false)
         imageProvider.request(.image(url: url)) { [weak self] result in
             
@@ -98,21 +108,15 @@ class PictureCell: UITableViewCell {
                 case let .success(response):
                     do {
                         let image = try response.mapImage()
-                        let size = CGSize(width: image.size.width, height: image.size.height)
+                        let size = CGSize(width: image.size.width, height: image.size.width)
                         let downsampledImage = self.resizedImage(image: image, for: size)
+                        //сделал force unwrap, потому что точно будет success.
+                        //Дай мне знать, если лучше сделать иначе.
+                        self.cacheProvider.save(key: url.absoluteString, value: (downsampledImage?.pngData())!)
+                        print("Image was saved to cahce")
                         DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage
                         }
-                        /*
-                         Этот код можно заменить на AVMakeRenct и поместить в main поток.
-                         Сейчас размер клеток фиксированный, но можно делать отностельно высоты загруженной картинки.
-                         self.imageOfTheWeek.image = image
-                         let aspectRatio = image.size.height / image.size.width
-                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                         self.aspectRatioConstraint = aspectRatioConstraint
-                         self.imageOfTheWeek.image = image
-                         */
-                        
                     } catch {
                         print(error)
                     }
@@ -140,7 +144,7 @@ private extension PictureCell {
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().inset(4).priority(.high)
-            make.height.greaterThanOrEqualTo(350)
+            make.height.equalTo(imageOfTheWeek.snp.width)
         }
         
         activityIndicatorContainer.snp.makeConstraints { make in
