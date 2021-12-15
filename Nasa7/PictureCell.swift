@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Moya
 
-var cacheProvider: CacheProviderProtocol?
+let cacheProvider = CacheProvider()
 
 protocol PictureCellDelegate: AnyObject {
     // Зачем Этот протокол?
@@ -96,7 +96,7 @@ class PictureCell: UITableViewCell {
             let image = UIImage(data: imageData)
             imageOfTheWeek.image = image
             print("image retrieved from cache")
-            setActivityIndicatorHidden(false)
+            setActivityIndicatorHidden(true)
             return
         }
         
@@ -115,7 +115,7 @@ class PictureCell: UITableViewCell {
                         let downsampledImage = self.resizedImage(image: image, for: size)
                         guard let safeImage = downsampledImage else {return}
                         cacheProvider.save(key: url.absoluteString, value: (safeImage.pngData())!)
-                        print("Image was saved to cahce")
+                        print("Image ?was saved to cahce")
                         DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage
                         }
