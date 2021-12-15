@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 import Moya
 
+var cacheProvider: CacheProviderProtocol?
+
 protocol PictureCellDelegate: AnyObject {
     // Зачем Этот протокол?
     func pictureCell(_ pictureCell: PictureCell, needsUpdateWith closure:() -> Void)
@@ -16,7 +18,7 @@ protocol PictureCellDelegate: AnyObject {
 
 class PictureCell: UITableViewCell {
 
-    let cacheProvider = CacheProvider()
+    
     
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
@@ -94,6 +96,7 @@ class PictureCell: UITableViewCell {
             let image = UIImage(data: imageData)
             imageOfTheWeek.image = image
             print("image retrieved from cache")
+            setActivityIndicatorHidden(false)
             return
         }
         
@@ -110,9 +113,8 @@ class PictureCell: UITableViewCell {
                         let image = try response.mapImage()
                         let size = CGSize(width: image.size.width, height: image.size.width)
                         let downsampledImage = self.resizedImage(image: image, for: size)
-                        //сделал force unwrap, потому что точно будет success.
-                        //Дай мне знать, если лучше сделать иначе.
-                        self.cacheProvider.save(key: url.absoluteString, value: (downsampledImage?.pngData())!)
+                        guard let safeImage = downsampledImage else {return}
+                        cacheProvider.save(key: url.absoluteString, value: (safeImage.pngData())!)
                         print("Image was saved to cahce")
                         DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage

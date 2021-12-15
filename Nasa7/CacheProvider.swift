@@ -8,13 +8,13 @@
 import Foundation
 
 protocol CacheProviderProtocol {
-    func retrieve (key: String) -> Data?
-    func save (key: String, value: Data)
+    func retrieve(key: String) -> Data?
+    func save(key: String, value: Data)
 }
 
 class CacheProvider {
     private var values = [String: Data]()
-    private let queue = DispatchQueue (label: "cacheQueue", qos: .userInitiated, attributes: .concurrent)
+    private let queue = DispatchQueue(label: "cacheQueue", qos: .userInitiated, attributes: .concurrent)
 }
 
 extension CacheProvider: CacheProviderProtocol {
