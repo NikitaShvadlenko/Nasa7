@@ -19,7 +19,7 @@ class PictureCell: UITableViewCell {
     private lazy var imageOfTheWeek: UIImageView = {
         let imageOfTheWeek = UIImageView()
         imageOfTheWeek.backgroundColor = .yellow
-        imageOfTheWeek.contentMode = .scaleToFill
+        imageOfTheWeek.contentMode = .scaleAspectFill
         imageOfTheWeek.clipsToBounds = true
         return imageOfTheWeek
     }()
@@ -103,16 +103,7 @@ class PictureCell: UITableViewCell {
                         DispatchQueue.main.async {
                             self.imageOfTheWeek.image = downsampledImage
                         }
-                        /*
-                         Этот код можно заменить на AVMakeRenct и поместить в main поток.
-                         Сейчас размер клеток фиксированный, но можно делать отностельно высоты загруженной картинки.
-                         self.imageOfTheWeek.image = image
-                         let aspectRatio = image.size.height / image.size.width
-                         let aspectRatioConstraint = self.imageOfTheWeek.heightAnchor.constraint(equalTo: self.imageOfTheWeek.widthAnchor, multiplier: aspectRatio)
-                         self.aspectRatioConstraint = aspectRatioConstraint
-                         self.imageOfTheWeek.image = image
-                         */
-                        
+
                     } catch {
                         print(error)
                     }
@@ -140,9 +131,8 @@ private extension PictureCell {
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().inset(4).priority(.high)
-            make.height.greaterThanOrEqualTo(350)
+            make.height.equalTo(imageOfTheWeek.snp.width)
         }
-        
         activityIndicatorContainer.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.height.width.equalTo(imageOfTheWeek)
